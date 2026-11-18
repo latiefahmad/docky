@@ -1,0 +1,18 @@
+export type IconName =
+  | "anchor"
+  | "github"
+  | "arrow-right"
+  | "arrow-up-right"
+  | "sliders"
+  | "battery"
+  | "search"
+  | "wifi"
+  | "volume"
+  | "task-view"
+  | "widgets"
+  | "copy"
+  | "check"
+  | "menu"
+  | "close"
+  | "app-window"
+  | "gear-six";

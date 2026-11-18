@@ -1,0 +1,184 @@
+name: Release
+
+# Push a tag matching the workspace version (for example Docky-v1.0.0) to
+# build the signed installer and attach it to a draft release. Review the
+# draft on GitHub and publish it by hand: only published releases reach the
+# website download link and the in-app updater.
+on:
+  push:
+    tags: ['Docky-v*']
+
+permissions:
+  contents: write
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: apps/settings/pnpm-lock.yaml
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check the tag matches the version
+        shell: pwsh
+        run: |
+          $version = (cargo metadata --format-version 1 --no-deps | ConvertFrom-Json).packages |
+            Where-Object name -eq 'docky' | Select-Object -ExpandProperty version
+          if ("Docky-v$version" -ne $env:GITHUB_REF_NAME) {
+            throw "Tag $env:GITHUB_REF_NAME does not match the workspace version $version"
+          }
+          "VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Install settings dependencies
+        working-directory: apps/settings
+        run: pnpm install --frozen-lockfile
+
+      - name: Build installer
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: ./scripts/build-installer.ps1
+
+      # Windows code signing through SignPath Foundation (FIRMA-DE-CODIGO.md).
+      # It runs only once the SignPath repository variables exist; until then
+      # the release is built unsigned, as before. Two signing requests, each
+      # approved by hand in SignPath: first the two programs, then the
+      # installer rebuilt around them. The installer must be signed before the
+      # updater signature (.sig) is made, or the updater rejects it.
+      - name: Collect the programs to sign
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force sign/binaries | Out-Null
+          Copy-Item target/release/docky-settings.exe sign/binaries/
+          Copy-Item apps/settings/src-tauri/binaries/docky-x86_64-pc-windows-msvc.exe sign/binaries/docky.exe
+
+      - name: Upload the programs to sign
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        id: unsigned-binaries
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-binaries
+          path: sign/binaries
+
+      - name: Sign the programs
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: binaries
+          github-artifact-id: ${{ steps.unsigned-binaries.outputs.artifact-id }}
+          wait-for-completion: true
+          # Leaves time to approve the request in SignPath.
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: sign/binaries-signed
+
+      # Tauri marks the settings program while bundling; it is already marked
+      # from the first build, so bundling again keeps the signature intact
+      # (checked locally with a test certificate).
+      - name: Rebuild the installer around the signed programs
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: |
+          Copy-Item sign/binaries-signed/docky-settings.exe target/release/ -Force
+          Copy-Item sign/binaries-signed/docky.exe apps/settings/src-tauri/binaries/docky-x86_64-pc-windows-msvc.exe -Force
+          '{ "bundle": { "createUpdaterArtifacts": false } }' | Set-Content -Encoding ascii no-updater.json
+          Push-Location apps/settings
+          pnpm tauri bundle --bundles nsis --config src-tauri/tauri.bundle.conf.json --config ../../no-updater.json
+          if ($LASTEXITCODE) { throw 'tauri bundle failed' }
+          Pop-Location
+          New-Item -ItemType Directory -Force sign/installer | Out-Null
+          Copy-Item "target/release/bundle/nsis/Docky_${env:VERSION}_x64-setup.exe" sign/installer/Docky-Setup.exe
+
+      - name: Upload the installer to sign
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        id: unsigned-installer
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-installer
+          path: sign/installer
+
+      - name: Sign the installer
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.unsigned-installer.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: sign/installer-signed
+
+      - name: Sign the signed installer for the updater
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          $setup = (Resolve-Path "target/release/bundle/nsis").Path + "/Docky_${env:VERSION}_x64-setup.exe"
+          Copy-Item sign/installer-signed/Docky-Setup.exe $setup -Force
+          $signature = Get-AuthenticodeSignature $setup
+          if ($signature.Status -ne 'Valid') { throw "The installer signature is $($signature.Status)" }
+          Push-Location apps/settings
+          pnpm tauri signer sign --app-version $env:VERSION $setup
+          if ($LASTEXITCODE) { throw 'tauri signer sign failed' }
+          Pop-Location
+
+      # latest.json is what the in-app updater reads; Docky-Setup.exe is a
+      # stable name for the website's "latest" download link.
+      - name: Prepare release files
+        shell: pwsh
+        run: |
+          $nsis = 'target/release/bundle/nsis'
+          $setup = "Docky_${env:VERSION}_x64-setup.exe"
+          $signature = Get-Content "$nsis/$setup.sig" -Raw
+          $repo = "https://github.com/$env:GITHUB_REPOSITORY"
+          $manifest = [ordered]@{
+            version   = $env:VERSION
+            notes     = "$repo/releases/tag/$env:GITHUB_REF_NAME"
+            pub_date  = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+            platforms = [ordered]@{
+              'windows-x86_64' = [ordered]@{
+                signature = $signature.Trim()
+                url       = "$repo/releases/download/$env:GITHUB_REF_NAME/$setup"
+              }
+            }
+          }
+          New-Item -ItemType Directory -Force upload | Out-Null
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8NoBOM upload/latest.json
+          Copy-Item "$nsis/$setup" upload/
+          Copy-Item "$nsis/$setup.sig" upload/
+          Copy-Item "$nsis/$setup" upload/Docky-Setup.exe
+
+          # The release text is this version's section of CHANGELOG.md (English
+          # and Spanish), between its heading and the next one.
+          $lines = Get-Content CHANGELOG.md
+          $start = [array]::IndexOf($lines, "## [$env:VERSION]")
+          if ($start -lt 0) { throw "CHANGELOG.md has no section for $env:VERSION" }
+          $rest = $lines[($start + 1)..($lines.Count - 1)]
+          $end = ($rest | Select-String -Pattern '^## \[' | Select-Object -First 1).LineNumber
+          $section = if ($end) { $rest[0..($end - 2)] } else { $rest }
+          $section | Set-Content -Encoding utf8NoBOM notes.md
+
+      - name: Create draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME (Get-ChildItem upload).FullName `
+            --draft --notes-file notes.md --title "Docky $env:GITHUB_REF_NAME"

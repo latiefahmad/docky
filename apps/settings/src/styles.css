@@ -1,0 +1,464 @@
+:root {
+  color-scheme: light dark;
+  --accent: #0a84ff;
+  --text: rgba(0, 0, 0, 0.88);
+  --text-dim: rgba(0, 0, 0, 0.55);
+  --sidebar: rgba(246, 246, 248, 0.55);
+  --content: rgba(255, 255, 255, 0.86);
+  --card: rgba(255, 255, 255, 0.8);
+  --line: rgba(0, 0, 0, 0.08);
+  --track: rgba(0, 0, 0, 0.16);
+  --hover: rgba(0, 0, 0, 0.06);
+  --segment: #ffffff;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: rgba(255, 255, 255, 0.92);
+    --text-dim: rgba(255, 255, 255, 0.55);
+    --sidebar: rgba(40, 40, 44, 0.5);
+    --content: rgba(30, 30, 32, 0.88);
+    --card: rgba(255, 255, 255, 0.06);
+    --line: rgba(255, 255, 255, 0.09);
+    --track: rgba(255, 255, 255, 0.2);
+    --hover: rgba(255, 255, 255, 0.08);
+    --segment: rgba(255, 255, 255, 0.22);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  color: var(--text);
+  user-select: none;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.window {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  /* One row exactly as tall as the window, so the content scrolls inside it
+     instead of growing past the bottom edge. */
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+}
+
+/* The sidebar lets the window's acrylic blur show through. */
+.sidebar {
+  background: var(--sidebar);
+  border-right: 1px solid var(--line);
+  padding: 14px 10px;
+}
+
+.traffic {
+  display: flex;
+  gap: 8px;
+  padding: 2px 6px 18px;
+}
+
+.light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+}
+
+.light-close {
+  background: #ff5f57;
+}
+
+.light-minimize {
+  background: #febc2e;
+}
+
+.light-zoom {
+  background: #28c840;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 7px;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: var(--hover);
+}
+
+.nav-item[aria-current="page"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.nav-icon {
+  flex: none;
+  filter: drop-shadow(0 0.5px 0.5px rgba(0, 0, 0, 0.18));
+}
+
+/* A titled group: the heading sits above its card, as in macOS. */
+.card-group {
+  margin-bottom: 16px;
+}
+
+.card-group .card {
+  margin-bottom: 0;
+}
+
+.card-title {
+  margin: 0 0 6px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  background: var(--content);
+  min-width: 0;
+  min-height: 0;
+}
+
+.content-title {
+  padding: 16px 24px 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.content-body {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Software update card, above every section while an update waits. */
+.update {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: 12px;
+  margin: 0 24px 14px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+}
+
+.update-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.update-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.update-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.update-detail {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.update-detail-error {
+  color: #ff453a;
+}
+
+.update-progress {
+  height: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--track);
+}
+
+.update-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.update-progress.is-unknown span {
+  animation: update-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes update-indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+/* Under the text, so a long title never squeezes into several lines. */
+.update-actions {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.update-actions .update-link {
+  margin-right: auto;
+}
+
+.update-link {
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.update-link:hover {
+  text-decoration: underline;
+}
+
+.nav-badge {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: auto;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  padding: 8px 14px;
+}
+
+.row + .row,
+.row-sub + .row {
+  border-top: 1px solid var(--line);
+}
+
+/* An option that depends on the row above: indented under it, with a divider
+   that starts at the indent, and folded away while that row is off. */
+.row-sub {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 0.24s cubic-bezier(0.3, 0.7, 0.2, 1),
+    opacity 0.2s ease;
+}
+
+.row-sub[data-open="false"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.row-sub-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.row-sub .row {
+  position: relative;
+  padding-left: 30px;
+}
+
+.row-sub .row::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 30px;
+  height: 1px;
+  content: "";
+  background: var(--line);
+}
+
+.row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.row-hint {
+  color: var(--text-dim);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.row-control {
+  flex-shrink: 0;
+}
+
+.toggle {
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--track);
+  padding: 2px;
+  transition: background 0.18s ease;
+}
+
+.toggle[aria-checked="true"] {
+  background: #34c759;
+}
+
+.toggle-knob {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s ease;
+}
+
+.toggle[aria-checked="true"] .toggle-knob {
+  transform: translateX(16px);
+}
+
+.slider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider-edge {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.slider input {
+  appearance: none;
+  width: 200px;
+  height: 4px;
+  border-radius: 2px;
+  margin: 0;
+  background: linear-gradient(to right, var(--accent) var(--filled), var(--track) var(--filled));
+}
+
+.slider input:disabled {
+  opacity: 0.4;
+}
+
+.slider input::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.segmented {
+  display: flex;
+  background: var(--hover);
+  border-radius: 7px;
+  padding: 2px;
+}
+
+.segment {
+  padding: 4px 12px;
+  border-radius: 5px;
+}
+
+.segment[aria-checked="true"] {
+  background: var(--segment);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.push {
+  padding: 4px 14px;
+  border-radius: 6px;
+  background: var(--segment);
+  box-shadow:
+    0 0 0 0.5px var(--line),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.push:disabled {
+  opacity: 0.5;
+}
+
+.push-danger {
+  background: #ff453a;
+  color: #fff;
+}
+
+.push-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.error {
+  color: #ff453a;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .toggle-knob,
+  .row-sub,
+  .update-progress span {
+    transition: none;
+  }
+
+  .update-progress.is-unknown span {
+    animation: none;
+  }
+}

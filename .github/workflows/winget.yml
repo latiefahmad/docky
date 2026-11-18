@@ -1,0 +1,26 @@
+name: winget
+
+# When a release is published, opens a pull request in microsoft/winget-pkgs
+# with the new version of latiefahmad.Docky. It only works once the first
+# version has been accepted there (submitted by hand; see FIRMA-DE-CODIGO.md),
+# and only when the WINGET_TOKEN secret exists: a classic GitHub token with the
+# public_repo scope, from an account that has a fork of winget-pkgs.
+on:
+  release:
+    types: [released]
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+    steps:
+      - name: Submit the new version to winget
+        if: env.WINGET_TOKEN != ''
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: latiefahmad.Docky
+          # The versioned file; Docky-Setup.exe is the same installer under a
+          # name that never changes, which winget does not want.
+          installers-regex: '_x64-setup\.exe$'
+          token: ${{ secrets.WINGET_TOKEN }}

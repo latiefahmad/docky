@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "publisher": "latiefahmad",
+    "homepage": "https://github.com/latiefahmad/Docky",
+    "shortDescription": "Dock estilo macOS para Windows",
+    "category": "Utility",
+    "externalBin": [
+      "binaries/docky"
+    ],
+    "windows": {
+      "nsis": {
+        "template": "installer/installer.nsi",
+        "installerHooks": "installer/hooks.nsh",
+        "installMode": "currentUser",
+        "languages": [
+          "English",
+          "Spanish"
+        ],
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico"
+      }
+    },
+    "createUpdaterArtifacts": true
+  }
+}

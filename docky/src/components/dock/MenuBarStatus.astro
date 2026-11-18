@@ -1,0 +1,22 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+---
+
+<span class="menu-status" aria-hidden="true">
+  <Icon name="widgets" size={13} class="hidden md:inline" />
+  <Icon name="task-view" size={13} class="hidden sm:inline" />
+  <Icon name="battery" size={15} />
+  <Icon name="volume" size={14} />
+  <Icon name="wifi" size={14} />
+  <Icon name="search" size={14} class="hidden sm:inline" />
+  <Icon name="sliders" size={14} />
+</span>
+
+<style>
+  .menu-status {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: clamp(7px, 1vw, 12px);
+  }
+</style>

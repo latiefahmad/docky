@@ -1,0 +1,29 @@
+[package]
+name = "docky-settings"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+docky-config.workspace = true
+docky-shell.workspace = true
+serde.workspace = true
+tauri = { version = "2", features = [] }
+tauri-plugin-updater = "2"
+# A second launch (dock menu, Start menu) focuses the open window instead of
+# opening another one that would save the same settings file.
+tauri-plugin-single-instance = "2"
+# `generate_context!` emits serde_json values for plugin settings.
+serde_json = "1"
+
+[features]
+# Serve the bundled front end instead of the Vite dev server. On by default so
+# a plain `cargo build` yields a working app; `tauri dev` turns it off.
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
