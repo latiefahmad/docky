@@ -1,9 +1,9 @@
 name: Release
 
 # Push a tag matching the workspace version (for example Docky-v1.0.0) to
-# build the signed installer and attach it to a draft release. Review the
-# draft on GitHub and publish it by hand: only published releases reach the
-# website download link and the in-app updater.
+# build the signed installer and publish it as a GitHub release. Publishing is
+# automatic: the release goes live, and the website download link and the
+# in-app updater pick it up as soon as the workflow finishes.
 on:
   push:
     tags: ['Docky-v*']
@@ -174,10 +174,10 @@ jobs:
           $section = if ($end) { $rest[0..($end - 2)] } else { $rest }
           $section | Set-Content -Encoding utf8NoBOM notes.md
 
-      - name: Create draft release
+      - name: Create release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create $env:GITHUB_REF_NAME (Get-ChildItem upload).FullName `
-            --draft --notes-file notes.md --title "Docky $env:VERSION"
+            --notes-file notes.md --title "Docky $env:VERSION"
