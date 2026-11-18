@@ -725,7 +725,7 @@ impl App {
         }
         for id in self.entries.iter().filter_map(|entry| entry.id.as_ref()) {
             let variant = if id == recycle_bin::PARSING_NAME {
-                if self.bin_full { "llena" } else { "vacia" }
+                if self.bin_full { "full" } else { "empty" }
             } else {
                 ""
             };
@@ -763,7 +763,7 @@ impl App {
             let label = self
                 .gfx
                 .label_brush(&name, scale, light)
-                .inspect_err(|error| eprintln!("docky: etiqueta de `{id}`: {error:#}"))
+                .inspect_err(|error| eprintln!("docky: label of `{id}`: {error:#}"))
                 .ok();
             self.assets.insert(id.clone(), Asset { icon, label });
         }

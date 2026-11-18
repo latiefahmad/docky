@@ -20,7 +20,7 @@ use crate::{
     names::display_name,
 };
 
-const MAGIC: &[u8; 4] = b"WDI1";
+const MAGIC: &[u8; 4] = b"WDI2";
 const HEADER_LEN: usize = 4 + 8 + 4 + 4 + 4;
 const SECONDS_PER_DAY: u64 = 86_400;
 
@@ -145,7 +145,7 @@ mod tests {
 
     fn sample() -> AppVisual {
         AppVisual {
-            name: "Explorador de Windows".into(),
+            name: "Windows Explorer".into(),
             icon: IconImage {
                 width: 2,
                 height: 2,

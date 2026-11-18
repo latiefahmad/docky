@@ -119,10 +119,47 @@ fn read_pixels(bitmap: &OwnedBitmap) -> Option<IconImage> {
             .0
             .iter_mut()
             .for_each(|px| px[3] = 255);
+    } else {
+        premultiply(&mut bgra);
     }
     Some(IconImage {
         width,
         height,
         bgra,
     })
+}
+
+/// Premultiplies the alpha of a BGRA buffer in place, as the compositor expects.
+///
+/// `GetDIBits` returns straight alpha, but the icon is drawn with a
+/// premultiplied-alpha bitmap (see `gfx::draw_image`). Without this, partly
+/// transparent pixels (anti-aliased edges) come out too bright, which shows as
+/// a halo around icons such as Command Prompt.
+fn premultiply(bgra: &mut [u8]) {
+    for px in bgra.as_chunks_mut::<4>().0 {
+        let alpha = u32::from(px[3]);
+        for channel in &mut px[..3] {
+            *channel = ((u32::from(*channel) * alpha + 127) / 255) as u8;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::premultiply;
+
+    #[test]
+    fn premultiply_should_scale_color_channels_by_alpha() {
+        // A fully opaque pixel is untouched; a half-transparent one is halved.
+        let mut bgra = vec![200, 100, 50, 255, 200, 100, 50, 128];
+        premultiply(&mut bgra);
+        assert_eq!(bgra, vec![200, 100, 50, 255, 100, 50, 25, 128]);
+    }
+
+    #[test]
+    fn premultiply_should_zero_out_fully_transparent_pixels() {
+        let mut bgra = vec![200, 100, 50, 0];
+        premultiply(&mut bgra);
+        assert_eq!(bgra, vec![0, 0, 0, 0]);
+    }
 }
