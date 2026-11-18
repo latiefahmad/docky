@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <!-- Docky: a geometric D monogram — white capsule bar, orange half-disc bowl. -->
-  <rect x="72" y="72" width="880" height="880" rx="198" ry="198" fill="#5B2EBE" />
-  <path d="M464 262a250 250 0 0 1 0 500Z" fill="#EE6234" />
-  <rect x="310" y="262" width="106" height="500" rx="53" ry="53" fill="#FFFFFF" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><rect width="880" height="880" x="72" y="72" fill="#5B2EBE" rx="198" ry="198"/><path fill="#EE6234" d="M464 262a250 250 0 0 1 0 500Z"/><rect width="106" height="500" x="310" y="262" fill="#FFF" rx="53" ry="53"/></svg>
