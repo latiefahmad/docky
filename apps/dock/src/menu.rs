@@ -98,7 +98,7 @@ pub fn show(gfx: &Gfx, owner: HWND, items: &[MenuItem], anchor: POINT, dark: boo
     match Popup::open(gfx, owner, items, anchor, dark) {
         Ok(popup) => popup.run(),
         Err(error) => {
-            eprintln!("docky: menú: {error:#}");
+            eprintln!("docky: menu: {error:#}");
             show_native(owner, items, anchor, dark)
         }
     }
@@ -864,8 +864,8 @@ mod tests {
     #[test]
     fn strip_mnemonic_should_drop_the_marker_and_keep_its_letter() {
         assert_eq!(
-            strip_mnemonic("Mostrar &escritorio"),
-            ("Mostrar escritorio".to_owned(), Some('e'))
+            strip_mnemonic("Hide &everything"),
+            ("Hide everything".to_owned(), Some('e'))
         );
         assert_eq!(
             strip_mnemonic("Show &Desktop"),

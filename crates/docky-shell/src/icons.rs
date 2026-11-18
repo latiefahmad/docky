@@ -15,13 +15,13 @@ use windows::{
 
 #[derive(Debug, Error)]
 pub enum IconError {
-    #[error("el shell no pudo generar el icono de `{name}`")]
+    #[error("the shell could not generate the icon of `{name}`")]
     Shell {
         name: String,
         #[source]
         source: windows::core::Error,
     },
-    #[error("no se pudieron leer los píxeles del icono de `{0}`")]
+    #[error("could not read the icon pixels of `{0}`")]
     Pixels(String),
 }
 

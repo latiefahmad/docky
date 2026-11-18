@@ -13,19 +13,19 @@ pub const CURRENT_VERSION: u32 = 1;
 /// Error reading or saving the configuration.
 #[derive(Debug, Error)]
 pub enum ConfigError {
-    #[error("no se pudo acceder a `{path}`")]
+    #[error("could not access `{path}`")]
     Io {
         path: PathBuf,
         #[source]
         source: io::Error,
     },
-    #[error("`{path}` no es una configuración válida")]
+    #[error("`{path}` is not a valid configuration")]
     Parse {
         path: PathBuf,
         #[source]
         source: serde_json::Error,
     },
-    #[error("no se pudo serializar la configuración")]
+    #[error("could not serialize the configuration")]
     Serialize(#[from] serde_json::Error),
 }
 
@@ -50,7 +50,7 @@ pub struct Config {
     /// Side of the icon under the cursor, in logical pixels.
     pub magnified_size: u32,
     /// Genie effect when minimizing. On by default; while enabled, the dock
-    /// turns off the system's own window transitions (see plan, "Efecto genio").
+    /// turns off the system's own window transitions (see plan, "Genie effect").
     pub genie: bool,
     /// Minimized windows get a live thumbnail in the right section of the
     /// dock. Off by default: they go into their app's icon instead.
@@ -73,17 +73,6 @@ pub struct Config {
     /// With `check_updates`: once a day, while the user is away from the
     /// computer, new versions are downloaded and installed without asking.
     pub auto_update: bool,
-    pub language: Language,
-}
-
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Language {
-    /// Follow the Windows display language.
-    #[default]
-    Auto,
-    Es,
-    En,
 }
 
 pub const ICON_SIZE_RANGE: (u32, u32) = (32, 96);
@@ -132,7 +121,6 @@ impl Default for Config {
             bounce_on_open: true,
             check_updates: true,
             auto_update: true,
-            language: Language::Auto,
         }
     }
 }

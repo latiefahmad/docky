@@ -20,8 +20,6 @@
   "aiUsage": "Show AI provider usage",
   "aiUsageHint": "Reads your existing sessions. Queries each provider directly every five minutes and does not save credentials.",
   "autostart": "Open Docky at login",
-  "language": "Language",
-  "languageAuto": "Automatic",
   "close": "Close",
   "minimize": "Minimize",
   "saveError": "The settings could not be saved.",

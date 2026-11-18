@@ -29,7 +29,7 @@ use windows::{
 };
 
 #[derive(Debug, Error)]
-#[error("no se pudo abrir `{id}` (código {code} del shell)")]
+#[error("could not open `{id}` (shell code {code})")]
 pub struct LaunchError {
     id: String,
     code: isize,

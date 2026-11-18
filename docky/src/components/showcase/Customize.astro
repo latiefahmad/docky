@@ -158,28 +158,6 @@ const textJson = JSON.stringify(settingsText).replace(/</g, "\\u003c");
                 <i></i>
               </button>
             </div>
-            <div class="settings-row">
-              <span class="settings-label" {...tx("language")}>
-                {t.language}
-              </span>
-              <span class="mac-seg" role="radiogroup" aria-label={t.language} data-label="language">
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked="false"
-                  data-lang="auto"
-                  {...tx("languageAuto")}
-                >
-                  {t.languageAuto}
-                </button>
-                <button type="button" role="radio" aria-checked="false" data-lang="es">
-                  Español
-                </button>
-                <button type="button" role="radio" aria-checked="true" data-lang="en">
-                  English
-                </button>
-              </span>
-            </div>
           </div>
           <div class="settings-card">
             <div class="settings-row">

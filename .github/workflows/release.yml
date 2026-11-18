@@ -165,8 +165,7 @@ jobs:
           Copy-Item "$nsis/$setup.sig" upload/
           Copy-Item "$nsis/$setup" upload/Docky-Setup.exe
 
-          # The release text is this version's section of CHANGELOG.md (English
-          # and Spanish), between its heading and the next one.
+          # The release text is this version's section of CHANGELOG.md, between its heading and the next one.
           $lines = Get-Content CHANGELOG.md
           $start = [array]::IndexOf($lines, "## [$env:VERSION]")
           if ($start -lt 0) { throw "CHANGELOG.md has no section for $env:VERSION" }

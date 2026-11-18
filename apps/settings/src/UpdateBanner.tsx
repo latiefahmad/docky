@@ -1,7 +1,7 @@
 import type { UpdateInfo } from "./config";
-import type es from "./i18n/es.json";
+import type en from "./i18n/en.json";
 
-type Texts = typeof es;
+type Texts = typeof en;
 
 interface UpdateBannerProps {
   t: Texts;

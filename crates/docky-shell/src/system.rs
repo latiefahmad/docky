@@ -207,14 +207,6 @@ pub fn downloads_folder() -> Option<String> {
     }
 }
 
-#[must_use]
-pub fn ui_language_is_spanish() -> bool {
-    const LANG_SPANISH: u16 = 0x0A;
-    // SAFETY: Read-only query.
-    let language = unsafe { windows::Win32::Globalization::GetUserDefaultUILanguage() };
-    language & 0x3FF == LANG_SPANISH
-}
-
 /// `false` if the user turned off "Animation effects" in Windows settings.
 #[must_use]
 pub fn animations_enabled() -> bool {

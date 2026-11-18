@@ -31,8 +31,8 @@ public static class DockyMeasure {
 }
 '@
 
-if (-not (Test-Path $Exe)) { throw "No existe $Exe. Compila antes: cargo build --release -p docky" }
-if (Get-Process docky -ErrorAction SilentlyContinue) { throw 'Ya hay un dock en marcha: ciérralo con `docky --quit`.' }
+if (-not (Test-Path $Exe)) { throw "$Exe does not exist. Build it first: cargo build --release -p docky" }
+if (Get-Process docky -ErrorAction SilentlyContinue) { throw 'A dock is already running: close it with `docky --quit`.' }
 
 $clock = [Diagnostics.Stopwatch]::StartNew()
 Start-Process $Exe -WindowStyle Hidden | Out-Null
@@ -51,10 +51,10 @@ Start-Sleep -Seconds $IdleSeconds
 
 $rows = foreach ($p in $procs) {
     $proc = Get-Process -Id $p.ProcessId
-    $role = if ($p.CommandLine -match '--guard') { 'guardián' } else { 'dock' }
+    $role = if ($p.CommandLine -match '--guard') { 'guard' } else { 'dock' }
     $pws = (Get-CimInstance Win32_PerfFormattedData_PerfProc_Process -Filter "IDProcess=$($p.ProcessId)").WorkingSetPrivate
     [pscustomobject]@{
-        Proceso               = $role
+        Process               = $role
         'Privada (MB)'        = [math]::Round($proc.PrivateMemorySize64 / 1MB, 1)
         'WS privado (MB)'     = [math]::Round($pws / 1MB, 1)
         'Working set (MB)'    = [math]::Round($proc.WorkingSet64 / 1MB, 1)
@@ -66,11 +66,11 @@ $rows = foreach ($p in $procs) {
     }
 }
 
-"Arranque hasta dock visible: $(if ($visibleMs) { "$visibleMs ms" } else { 'no apareció en 10 s' })"
+"Boot to visible dock: $(if ($visibleMs) { "$visibleMs ms" } else { 'did not appear in 10 s' })"
 "Reposo medido: $IdleSeconds s"
 $rows | Format-Table -AutoSize | Out-String -Width 200
-"Privada = memoria comprometida solo por el proceso (la métrica real)."
-"WS privado = lo que muestra el Administrador de tareas en 'Memoria'."
+"Private = memory committed only by the process (the real metric)."
+"Private WS = what Task Manager shows under 'Memory'."
 
 & $Exe --quit
 Start-Sleep -Seconds 2

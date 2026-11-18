@@ -138,7 +138,7 @@ async fn install_update(
         .lock()
         .map_err(|error| error.to_string())?
         .clone()
-        .ok_or("no hay ninguna actualización pendiente")?;
+        .ok_or("there is no pending update")?;
     let mut downloaded = 0u64;
     update
         .download_and_install(
@@ -176,7 +176,7 @@ async fn update_in_background(app: AppHandle) {
     if let Some(update) = found.filter(|_| !window_opened())
         && let Err(error) = update.download_and_install(|_, _| {}, || {}).await
     {
-        eprintln!("docky-settings: actualización: {error}");
+        eprintln!("docky-settings: update: {error}");
     }
     if !window_opened() {
         app.exit(0);
@@ -209,7 +209,7 @@ fn main() {
         && !dock_link::is_running()
         && let Err(error) = dock_exe().and_then(|dock| Command::new(dock).spawn())
     {
-        eprintln!("docky-settings: no se pudo abrir el dock: {error}");
+        eprintln!("docky-settings: could not open the dock: {error}");
     }
     let result = tauri::Builder::default()
         // First, so a second launch exits before doing anything else.

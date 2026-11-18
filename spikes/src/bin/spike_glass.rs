@@ -162,19 +162,14 @@ fn build_visuals(compositor: &Compositor) -> Result<ContainerVisual> {
 fn hit_test(hwnd: HWND, origin: POINT) {
     let (px, py) = pill_origin();
     let cases = [
-        ("centro del dock", px + PILL_W / 2, py + PILL_H / 2, true),
+        ("dock center", px + PILL_W / 2, py + PILL_H / 2, true),
         (
-            "zona transparente sobre el dock",
+            "transparent area over the dock",
             px + PILL_W / 2,
             py - 60,
             false,
         ),
-        (
-            "esquina redondeada (fuera de la curva)",
-            px + 2,
-            py + 2,
-            false,
-        ),
+        ("rounded corner (outside the curve)", px + 2, py + 2, false),
     ];
     for (name, x, y, expect_ours) in cases {
         let point = POINT {
@@ -186,7 +181,7 @@ fn hit_test(hwnd: HWND, origin: POINT) {
         let verdict = if ours == expect_ours { "OK" } else { "FALLO" };
         println!(
             "[{verdict}] {name}: el clic llega a {}",
-            if ours { "Docky" } else { "la ventana de abajo" }
+            if ours { "Docky" } else { "the window below" }
         );
     }
 }

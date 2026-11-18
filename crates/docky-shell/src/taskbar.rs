@@ -49,7 +49,7 @@ pub fn take_over() {
         if let Err(error) = saved {
             // Never hide the system taskbar unless the guard can restore its
             // original state after a crash or hang.
-            eprintln!("docky: no se pudo guardar el estado de la barra: {error}");
+            eprintln!("docky: could not save the taskbar state: {error}");
             return;
         }
     }

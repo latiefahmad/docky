@@ -19,7 +19,7 @@ const ICON_GAP = 6;
 type Strings = Record<string, string>;
 
 /**
- * The Settings replica: switches, sliders, the language picker and the update check
+ * The Settings replica: switches, sliders, the update check
  * all behave like the app, and the preview desk follows them as the dock would.
  */
 export function initCustomize(root: HTMLElement) {
@@ -31,8 +31,8 @@ export function initCustomize(root: HTMLElement) {
   const textNode = root.querySelector<HTMLScriptElement>("[data-settings-text]");
   if (!scene || !preview || !dock || !bar || !textNode) return;
 
-  const texts = JSON.parse(textNode.textContent ?? "{}") as Record<"en" | "es", Strings>;
-  let strings = texts.en;
+  const texts = JSON.parse(textNode.textContent ?? "{}") as Record<"en", Strings>;
+  const strings = texts.en;
   const icons = [...dock.querySelectorAll<HTMLImageElement>("img")];
   const ranges = new Map(
     [...scene.querySelectorAll<HTMLInputElement>("input[data-setting]")].map((input) => [
@@ -178,7 +178,7 @@ export function initCustomize(root: HTMLElement) {
     });
   });
 
-  /* ---- Panes and language ---------------------------------------------- */
+  /* ---- Panes ------------------------------------------------------------ */
 
   const title = scene.querySelector<HTMLElement>("[data-pane-title]");
   let pane = "dock";
@@ -198,27 +198,6 @@ export function initCustomize(root: HTMLElement) {
   });
 
   const status = scene.querySelector<HTMLElement>("[data-update-status]");
-  const setLanguage = (choice: string) => {
-    const resolved = choice === "auto" ? (navigator.language.toLowerCase().startsWith("es") ? "es" : "en") : choice;
-    strings = texts[resolved === "es" ? "es" : "en"];
-    scene.lang = resolved === "es" ? "es" : "en";
-    scene.querySelectorAll<HTMLElement>("[data-t]").forEach((node) => {
-      const text = strings[node.dataset.t ?? ""];
-      if (text) node.textContent = text;
-    });
-    scene.querySelectorAll<HTMLElement>("[data-label], [data-setting]").forEach((node) => {
-      const key = node.dataset.label ?? node.dataset.setting ?? "";
-      if (strings[key]) node.setAttribute("aria-label", strings[key]);
-    });
-    if (status) status.textContent = strings.updatesCurrent;
-    scene.querySelectorAll<HTMLButtonElement>("[data-lang]").forEach((button) => {
-      button.setAttribute("aria-checked", String(button.dataset.lang === choice));
-    });
-    showPane(pane);
-  };
-  scene.querySelectorAll<HTMLButtonElement>("[data-lang]").forEach((button) => {
-    button.addEventListener("click", () => setLanguage(button.dataset.lang ?? "auto"));
-  });
 
   const check = scene.querySelector<HTMLButtonElement>("[data-update]");
   check?.addEventListener("click", () => {

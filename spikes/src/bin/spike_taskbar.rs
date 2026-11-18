@@ -126,7 +126,7 @@ fn report(step: &str) {
         })
         .collect();
     println!(
-        "{step:<22} barras(visible,fantasma,top)={visible:?} autoocultar={} area_trabajo=({},{})-({},{})",
+        "{step:<22} bars(visible,phantom,top)={visible:?} autohide={} work_area=({},{})-({},{})",
         autohide_enabled(),
         work.left,
         work.top,
@@ -193,7 +193,7 @@ fn main() -> Result<()> {
     match env::args().nth(1).as_deref() {
         Some("test") => {
             let original = autohide_enabled();
-            report("antes");
+            report("before");
             hide();
             for i in 1..=4 {
                 sleep(Duration::from_secs(1));

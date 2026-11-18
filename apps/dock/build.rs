@@ -7,6 +7,6 @@ fn main() {
     resources.set("FileDescription", "Docky dock");
     if let Err(error) = resources.compile() {
         // The icon is cosmetic: a missing resource compiler must not block the build.
-        println!("cargo:warning=no se pudo incrustar el icono: {error}");
+        println!("cargo:warning=could not embed the icon: {error}");
     }
 }

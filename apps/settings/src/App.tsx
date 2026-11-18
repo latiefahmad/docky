@@ -4,7 +4,6 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type Config,
-  type Language,
   type UpdateInfo,
   ICON_SIZE,
   MAX_MAGNIFIED_SIZE,
@@ -17,11 +16,10 @@ import {
   saveConfig,
   setAutostart,
 } from "./config";
-import { Card, Row, Segmented, Slider, SubRow, Toggle } from "./controls";
+import { Card, Row, Slider, SubRow, Toggle } from "./controls";
 import { type SectionId, SectionIcon } from "./icons";
 import { UpdateBanner } from "./UpdateBanner";
 import en from "./i18n/en.json";
-import es from "./i18n/es.json";
 
 type UpdateState =
   | { kind: "off" }
@@ -45,18 +43,12 @@ interface ProgressEvent {
   downloaded: number;
   total: number | null;
 }
-type Texts = typeof es;
+type Texts = typeof en;
 
 /** Dragging a slider saves at most this often; the dock redraws on each save. */
 const SAVE_DELAY_MS = 60;
 /** How long the reset button stays armed after the first click. */
 const RESET_CONFIRM_MS = 4000;
-
-function textsFor(language: Language): Texts {
-  const spanish =
-    language === "es" || (language === "auto" && navigator.language.toLowerCase().startsWith("es"));
-  return spanish ? es : en;
-}
 
 export function App() {
   const [config, setConfig] = useState<Config | null>(null);
@@ -166,7 +158,7 @@ export function App() {
   }, [confirmingReset, update]);
 
   if (!config) return <div className="window" />;
-  const t = textsFor(config.language);
+  const t = en;
   const appWindow = getCurrentWindow();
   const waiting = pendingUpdate(updateState);
   // An update the user asked for keeps its banner even after "Later".
@@ -340,18 +332,6 @@ export function App() {
               <Card>
                 <Row label={t.autostart}>
                   <Toggle label={t.autostart} checked={autostart} onChange={changeAutostart} />
-                </Row>
-                <Row label={t.language}>
-                  <Segmented<Language>
-                    label={t.language}
-                    value={config.language}
-                    options={[
-                      { value: "auto", label: t.languageAuto },
-                      { value: "es", label: "Español" },
-                      { value: "en", label: "English" },
-                    ]}
-                    onChange={(language) => update({ language })}
-                  />
                 </Row>
               </Card>
               <Card title={t.updates}>

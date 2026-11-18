@@ -79,7 +79,7 @@ export const anatomy: AnatomyGroup[] = [
 export const customizeIntro = {
   eyebrow: "Settings",
   title: "Make it yours.",
-  lead: "A real settings window, in English or Spanish. Every change reaches the dock the moment you make it. Try it here.",
+  lead: "A real settings window in English. Every change reaches the dock the moment you make it. Try it here.",
 } as const;
 
 /** The preview dock in the Customize scene. */
@@ -110,7 +110,7 @@ export const settingsDefaults = {
   autostart: true,
 } as const;
 
-/** The Settings app's own strings (`apps/settings/src/i18n`), in both languages. */
+/** The Settings app's own strings (`apps/settings/src/i18n`), in English. */
 export const settingsText = {
   en: {
     title: "Docky Settings",
@@ -137,44 +137,10 @@ export const settingsText = {
     showMinimized: "Show minimized windows",
     showMinimizedHint: "As thumbnails on the right side of the Dock, instead of inside their app's icon.",
     autostart: "Open Docky at login",
-    language: "Language",
-    languageAuto: "Automatic",
     updates: "Updates",
     updatesCurrent: `Docky ${site.version} is up to date.`,
     updatesChecking: "Checking for updates…",
     updatesCheck: "Check",
-  },
-  es: {
-    title: "Ajustes de Docky",
-    dock: "Dock",
-    windows: "Ventanas",
-    menubar: "Barra superior",
-    system: "Sistema",
-    size: "Tamaño",
-    small: "Pequeño",
-    large: "Grande",
-    magnification: "Ampliación",
-    magnificationHint: "Los iconos crecen al pasar el puntero sobre ellos.",
-    magnifiedSize: "Tamaño ampliado",
-    autoHide: "Ocultar y mostrar el Dock automáticamente",
-    autoHideHint: "Reaparece al tocar el borde inferior de la pantalla.",
-    menuBar: "Mostrar la barra superior",
-    menuBarHint: "Hora, batería y acceso a los ajustes rápidos y las notificaciones de Windows.",
-    menuBarAutoHide: "Ocultar y mostrar la barra superior automáticamente",
-    menuBarAutoHideHint: "Reaparece al tocar el borde superior de la pantalla.",
-    aiUsage: "Mostrar uso de proveedores de IA",
-    aiUsageHint: "Mientras un cliente de IA compatible está abierto, una isla en la barra superior muestra sus límites disponibles.",
-    genie: "Efecto genio",
-    genieHint: "Mientras está activo, las ventanas no usan las animaciones de Windows al maximizar ni al cerrar.",
-    showMinimized: "Mostrar ventanas minimizadas",
-    showMinimizedHint: "Como miniaturas a la derecha del Dock, en lugar de dentro del icono de su app.",
-    autostart: "Abrir Docky al iniciar sesión",
-    language: "Idioma",
-    languageAuto: "Automático",
-    updates: "Actualizaciones",
-    updatesCurrent: `Docky ${site.version} está al día.`,
-    updatesChecking: "Buscando actualizaciones…",
-    updatesCheck: "Buscar",
   },
 } as const;
 

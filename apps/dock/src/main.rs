@@ -67,7 +67,7 @@ fn main() -> Result<()> {
             Ok(autostart::set(Some(&exe.to_string_lossy()))?)
         }
         ["--autostart", "off"] => Ok(autostart::set(None)?),
-        [guard::FLAG, pid] => guard::run(pid.parse().context("pid no válido")?),
+        [guard::FLAG, pid] => guard::run(pid.parse().context("invalid pid")?),
         ["--usage-worker"] => usage::worker_main(),
         [shell_work::FLAG] => shell_work::worker_main(),
         _ => bail!("uso: docky [--quit | --restore | --autostart on|off]"),
@@ -79,7 +79,7 @@ fn run_dock() -> Result<()> {
     let _single = unsafe { CreateMutexW(None, false, w!("Local\\Docky.Dock"))? };
     // SAFETY: Reads the thread's last error immediately after the call.
     if unsafe { GetLastError() } == ERROR_ALREADY_EXISTS {
-        eprintln!("docky: ya hay un dock en marcha");
+        eprintln!("docky: a dock is already running");
         return Ok(());
     }
 

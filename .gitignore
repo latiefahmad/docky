@@ -1,7 +1,7 @@
 /target
 node_modules/
 dist/
-# configuración local de cargo (ruta de compilación fuera de OneDrive)
+# local cargo config (build path outside OneDrive)
 /.cargo/config.toml
 *.log
 ejemplos/**

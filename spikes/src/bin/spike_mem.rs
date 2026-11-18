@@ -100,7 +100,7 @@ fn main() -> Result<()> {
     };
     let dxgi = device(kind, single)?;
     report(if warp {
-        "2. + Direct3D (WARP, por CPU)"
+        "2. + Direct3D (WARP, on CPU)"
     } else {
         "2. + Direct3D (GPU)"
     });
@@ -111,7 +111,7 @@ fn main() -> Result<()> {
             .cast::<ICompositorInterop>()?
             .CreateGraphicsDevice(&d2d)?
     };
-    report("3. + Direct2D y dispositivo de composición");
+    report("3. + Direct2D and composition device");
     // SAFETY: Windows initializes the returned COM interface, which is held by `_dwrite`.
     let _dwrite: IDWriteFactory = unsafe { DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)? };
     report("4. + DirectWrite");

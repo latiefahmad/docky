@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="650" viewBox="0 0 1280 650" role="img" aria-label="Vista previa de la isla de uso de Claude y Codex en la barra superior de Docky">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="650" viewBox="0 0 1280 650" role="img" aria-label="Preview of the Claude and Codex usage island in the Docky menu bar">
   <defs>
     <linearGradient id="sky" x2="0" y2="1">
       <stop stop-color="#9bb9db"/>
@@ -19,7 +19,7 @@
   </defs>
   <rect width="1280" height="650" fill="#edf0f4"/>
   <text x="80" y="51" fill="#282d38" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="28" font-weight="650">Docky · Uso de IA</text>
-  <text x="80" y="78" fill="#707887" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="16">Vista de diseño · valores de ejemplo</text>
+  <text x="80" y="78" fill="#707887" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="16">Design view · sample values</text>
 
   <rect x="80" y="105" width="1120" height="168" rx="23" fill="url(#sky)"/>
   <path d="M80 128Q80 105 103 105H1177Q1200 105 1200 128V141H80Z" fill="url(#glass)"/>
@@ -54,8 +54,8 @@
   <rect x="460" y="404" width="342" height="6" rx="3" fill="#34373d"/>
   <rect x="460" y="404" width="215" height="6" rx="3" fill="#d97757"/>
   <text x="802" y="428" text-anchor="end" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">5 h reinicia 21:40</text>
-  <text x="460" y="443" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">7 días · 19% usado</text>
-  <text x="802" y="443" text-anchor="end" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">Reinicia mañana 08:00</text>
+  <text x="460" y="443" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">7 days · 19% used</text>
+  <text x="802" y="443" text-anchor="end" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">Resets tomorrow 08:00</text>
   <rect x="414" y="457" width="452" height="1" fill="#292c32"/>
   <use href="#codex" x="422" y="470" width="28" height="28"/>
   <text x="460" y="490" fill="#f2f3f5" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="17" font-weight="600">Codex</text>
@@ -63,9 +63,9 @@
   <rect x="460" y="505" width="342" height="6" rx="3" fill="#34373d"/>
   <rect x="460" y="505" width="96" height="6" rx="3" fill="#8ec5ff"/>
   <text x="802" y="529" text-anchor="end" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">5 h reinicia 23:15</text>
-  <text x="460" y="544" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">7 días · 41% usado</text>
+  <text x="460" y="544" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">7 days · 41% used</text>
   <text x="802" y="544" text-anchor="end" fill="#9ea5af" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="12">Reinicia el 21/11 08:00</text>
-  <text x="640" y="567" text-anchor="middle" fill="#777f8b" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="11">Actualizado hace 2 min</text>
+  <text x="640" y="567" text-anchor="middle" fill="#777f8b" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="11">Updated 2 min ago</text>
   <rect x="100" y="585" width="155" height="28" rx="14" fill="#fff" opacity=".8"/>
   <text x="118" y="604" fill="#35383f" font-family="Segoe UI Variable,Segoe UI,sans-serif" font-size="15" font-weight="600">Vista ampliada</text>
 </svg>

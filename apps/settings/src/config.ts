@@ -1,6 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
 
-export type Language = "auto" | "es" | "en";
 
 /** Mirrors `docky_config::Config`. */
 export interface Config {
@@ -21,7 +20,6 @@ export interface Config {
   bounceOnOpen: boolean;
   checkUpdates: boolean;
   autoUpdate: boolean;
-  language: Language;
 }
 
 export const ICON_SIZE = { min: 32, max: 96 } as const;

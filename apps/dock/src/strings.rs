@@ -1,11 +1,4 @@
-//! User-facing dock text in Spanish and English. The language follows the
-//! Windows display language; Settings will be able to override it (phase 7).
-//! `&` marks the menu access key.
-
-use std::sync::atomic::{AtomicU8, Ordering};
-
-use docky_config::Language;
-use docky_shell::system::ui_language_is_spanish;
+//! User-facing dock text in English. `&` marks the menu access key.
 
 pub struct Strings {
     pub open: &'static str,
@@ -37,36 +30,6 @@ pub struct Strings {
     pub shell_operation_failed: &'static str,
 }
 
-const ES: Strings = Strings {
-    shell_operation_failed: "No se pudo iniciar la operación. Inténtalo de nuevo en un momento.",
-    open: "&Abrir",
-    new_window: "&Nueva ventana",
-    keep_in_dock: "&Mantener en el Dock",
-    show_in_explorer: "Mostrar en el &Explorador",
-    quit_app: "&Salir",
-    empty_bin: "&Vaciar papelera",
-    turn_hiding_on: "Activar &ocultación automática",
-    turn_hiding_off: "Desactivar &ocultación automática",
-    quit_dock: "Salir de &Docky",
-    start: "Inicio",
-    remove: "Quitar",
-    close_window: "&Cerrar",
-    settings: "&Ajustes de Docky…",
-    import_pins: "Añadir apps &fijadas en la barra de Windows",
-    run_as_admin: "Ejecutar como a&dministrador",
-    show_desktop: "Mostrar &escritorio",
-    usage_title: "Uso de IA",
-    usage_refresh: "Actualizar",
-    usage_refreshing: "Actualizando…",
-    usage_sign_in: "Inicia sesión",
-    usage_unavailable: "No disponible",
-    usage_loading: "Cargando…",
-    usage_stale: "Sin actualizar",
-    usage_resets: "Reinicia",
-    usage_updated: "Actualizado hace",
-    usage_used: "usado",
-};
-
 const EN: Strings = Strings {
     shell_operation_failed: "The operation could not start. Please try again in a moment.",
     open: "&Open",
@@ -97,25 +60,6 @@ const EN: Strings = Strings {
     usage_used: "used",
 };
 
-/// 0 = not chosen yet (follow Windows), 1 = Spanish, 2 = English.
-static LANGUAGE: AtomicU8 = AtomicU8::new(0);
-
-pub fn set_language(language: Language) {
-    let spanish = match language {
-        Language::Auto => ui_language_is_spanish(),
-        Language::Es => true,
-        Language::En => false,
-    };
-    LANGUAGE.store(if spanish { 1 } else { 2 }, Ordering::Relaxed);
-}
-
 pub fn text() -> &'static Strings {
-    match LANGUAGE.load(Ordering::Relaxed) {
-        0 => {
-            set_language(Language::Auto);
-            text()
-        }
-        1 => &ES,
-        _ => &EN,
-    }
+    &EN
 }

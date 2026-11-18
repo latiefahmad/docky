@@ -95,7 +95,7 @@ use crate::{
     menubar::MenuBar,
     scene::{Drag, Frame, Scene, SceneInput, SlotContent, Theme},
     shell_work::{self, Action as ShellAction},
-    strings::{self, text},
+    strings::text,
     thumbnails::Thumbnails,
 };
 
@@ -576,7 +576,7 @@ fn load_config() -> Config {
         }
         Err(error) => {
             // Do not overwrite it; the user may want to repair the file.
-            eprintln!("docky: {error}; se usan los valores por defecto");
+            eprintln!("docky: {error}; using the default values");
             Config::default()
         }
     }
@@ -595,7 +595,7 @@ fn save_settings(roster: &Roster, config: &Config) {
     let path = docky_config::default_path();
     if let Err(error) = docky_config::load(&path) {
         // Do not overwrite a corrupted file; report it and skip saving.
-        eprintln!("docky: {error}; no se guardan los cambios del dock");
+        eprintln!("docky: {error}; the dock changes are not saved");
         return;
     }
     let config = Config {
@@ -755,7 +755,7 @@ impl App {
                     let side = wanted.min(visual.icon.width);
                     self.gfx
                         .icon_brush(&visual.icon, side)
-                        .inspect_err(|error| eprintln!("docky: icono de `{id}`: {error:#}"))
+                        .inspect_err(|error| eprintln!("docky: icon of `{id}`: {error:#}"))
                         .ok()
                 })
                 .or_else(|| self.placeholder.clone());
@@ -1617,7 +1617,7 @@ impl App {
         if let Some(settings) = settings
             && let Err(error) = std::process::Command::new(settings).arg("--update").spawn()
         {
-            eprintln!("docky: actualización: {error}");
+            eprintln!("docky: update: {error}");
         }
     }
 
@@ -2258,11 +2258,6 @@ impl App {
         if config == self.config {
             return Ok(());
         }
-        if config.language != self.config.language {
-            strings::set_language(config.language);
-            // Labels are drawn text: redraw them in the new language.
-            self.assets_for = (0.0, false, 0);
-        }
         if !config.genie {
             self.restore_transitions();
             self.snapshots.clear();
@@ -2522,7 +2517,7 @@ impl App {
             self.menubar = None;
         } else if self.menubar.is_none() {
             self.menubar = MenuBar::create(&self.gfx, self.config.ai_usage)
-                .inspect_err(|error| eprintln!("docky: barra superior: {error:#}"))
+                .inspect_err(|error| eprintln!("docky: menu bar: {error:#}"))
                 .ok();
         }
         if let Some(bar) = &mut self.menubar {
@@ -2531,7 +2526,7 @@ impl App {
                 .and_then(|()| bar.set_usage_enabled(&self.gfx, self.config.ai_usage))
                 .and_then(|()| bar.set_visible(!self.fullscreen));
             if let Err(error) = applied {
-                eprintln!("docky: barra superior: {error:#}");
+                eprintln!("docky: menu bar: {error:#}");
             }
         }
     }
@@ -2625,7 +2620,7 @@ impl App {
         // Updating an app name can fail transiently; it must never prevent
         // the dock or bar from returning after full-screen mode.
         if let Err(error) = self.update_menu_bar_app() {
-            eprintln!("docky: nombre de la barra superior: {error:#}");
+            eprintln!("docky: menu bar name: {error:#}");
         }
         Ok(())
     }
@@ -2726,7 +2721,7 @@ fn with_app_value<T: Default>(what: &str, action: impl FnOnce(&mut App) -> Resul
 }
 
 pub fn menu_bar_clicked(x: f32, y: f32) {
-    with_app("barra superior", |app| {
+    with_app("menu bar", |app| {
         if let Some(bar) = &mut app.menubar {
             bar.click(&app.gfx, x, y)?;
         }
@@ -2736,28 +2731,28 @@ pub fn menu_bar_clicked(x: f32, y: f32) {
 
 /// The pointer rested on the top edge with the menu bar hidden.
 pub fn menu_bar_edge_rested() {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.edge_rested(&app.gfx),
         None => Ok(()),
     });
 }
 
 pub fn menu_bar_hover(inside: bool) {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.hover(&app.gfx, inside),
         None => Ok(()),
     });
 }
 
 pub fn menu_bar_pointer_moved(x: f32) {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.pointer_moved(&app.gfx, x),
         None => Ok(()),
     });
 }
 
 pub fn menu_bar_dismiss_usage() {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.dismiss_usage(&app.gfx),
         None => Ok(()),
     });
@@ -2766,40 +2761,40 @@ pub fn menu_bar_dismiss_usage() {
 /// Redraws the menu bar from what it reads on each draw (input language,
 /// clock), without asking the network or audio again.
 pub fn menu_bar_refresh() {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.refresh(&app.gfx),
         None => Ok(()),
     });
 }
 
 pub fn menu_bar_privacy_changed() {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.privacy_changed(&app.gfx),
         None => Ok(()),
     });
 }
 
 pub fn menu_bar_tick() {
-    with_app("barra superior", |app| match &mut app.menubar {
+    with_app("menu bar", |app| match &mut app.menubar {
         Some(bar) => bar.tick(&app.gfx),
         None => Ok(()),
     });
 }
 
 pub fn drag_enter(files: Vec<String>, x: i32, _y: i32) -> DROPEFFECT {
-    with_app_value("arrastre de archivos", |app| app.on_drag_enter(files, x))
+    with_app_value("file drag", |app| app.on_drag_enter(files, x))
 }
 
 pub fn drag_over(x: i32, _y: i32) -> DROPEFFECT {
-    with_app_value("arrastre de archivos", |app| app.on_drag_over(x))
+    with_app_value("file drag", |app| app.on_drag_over(x))
 }
 
 pub fn drag_leave() {
-    with_app("arrastre de archivos", App::on_drag_leave);
+    with_app("file drag", App::on_drag_leave);
 }
 
 pub fn drop_files(x: i32, _y: i32) -> DROPEFFECT {
-    with_app_value("soltar archivos", |app| app.on_drop(x))
+    with_app_value("file drop", |app| app.on_drop(x))
 }
 
 /// Checks the recycle bin on a background thread by scanning each drive
@@ -2838,7 +2833,7 @@ fn query_bin_in_background() {
         });
     if let Err(error) = spawned {
         BIN_QUERY.0.store(0, Ordering::Release);
-        eprintln!("docky: no se pudo consultar la Papelera: {error}");
+        eprintln!("docky: could not query the Recycle Bin: {error}");
     }
 }
 
@@ -2850,7 +2845,7 @@ fn run_outside(outside: Outside) {
     let submit = |action| {
         let result = shell_work::dispatch(action);
         if let Err(error) = result {
-            eprintln!("docky: operación no iniciada: {error:#}");
+            eprintln!("docky: operation did not start: {error:#}");
             shell_work::notify_not_started();
         }
     };
@@ -2885,7 +2880,7 @@ fn run_outside(outside: Outside) {
                 Some(path) if path.exists() => submit(ShellAction::Open {
                     id: path.to_string_lossy().into_owned(),
                 }),
-                _ => eprintln!("docky: no se encontró docky-settings.exe junto al dock"),
+                _ => eprintln!("docky: no docky-settings.exe found next to the dock"),
             }
         }
         Outside::Menu(request) => {
@@ -2897,9 +2892,9 @@ fn run_outside(outside: Outside) {
                 request.anchor,
                 request.dark,
             );
-            with_app("menú cerrado", App::after_menu);
+            with_app("menu closed", App::after_menu);
             if let Some(command) = chosen {
-                with_app_then("orden del menú", |app| {
+                with_app_then("menu command", |app| {
                     app.on_command(request.target, command)
                 });
             }
@@ -2918,11 +2913,11 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             unsafe {
                 let _ = KillTimer(Some(hwnd), ASSETS_TIMER);
             }
-            with_app("iconos del shell", App::assets_ready);
+            with_app("shell icons", App::assets_ready);
         }
-        WM_MOUSEMOVE => with_app("movimiento del ratón", App::on_mouse_move),
-        WM_MOUSELEAVE => with_app("salida del ratón", App::on_mouse_leave),
-        WM_LBUTTONDOWN => with_app("pulsación", App::on_press),
+        WM_MOUSEMOVE => with_app("mouse move", App::on_mouse_move),
+        WM_MOUSELEAVE => with_app("mouse leave", App::on_mouse_leave),
+        WM_LBUTTONDOWN => with_app("press", App::on_press),
         WM_LBUTTONUP => with_app_then("clic", App::on_release),
         WM_MBUTTONUP => with_app_then("clic central", App::on_middle_click),
         WM_CAPTURECHANGED => {
@@ -2931,10 +2926,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
                 let _ = PostMessageW(Some(hwnd), DRAG_CANCELLED, WPARAM(0), LPARAM(0));
             }
         }
-        DRAG_CANCELLED => with_app("arrastre", App::cancel_drag),
-        DROP_RUN => with_app_then("soltar archivos", |app| Ok(app.pending_drop.take())),
-        WM_RBUTTONUP => with_app_then("menú", App::on_right_click),
-        BIN_STATE => with_app("papelera", |app| app.set_bin_full(w.0 != 0)),
+        DRAG_CANCELLED => with_app("drag", App::cancel_drag),
+        DROP_RUN => with_app_then("file drop", |app| Ok(app.pending_drop.take())),
+        WM_RBUTTONUP => with_app_then("menu", App::on_right_click),
+        BIN_STATE => with_app("recycle bin", |app| app.set_bin_full(w.0 != 0)),
         BIN_CHANGED => {
             // SAFETY: `hwnd` is this live window on its owning UI thread.
             unsafe { SetTimer(Some(hwnd), BIN_TIMER, BIN_DELAY_MS, None) };
@@ -2975,7 +2970,7 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             with_app("apps fijadas", App::sync_taskbar_pins);
         }
         WM_TIMER if w.0 == UPDATE_TIMER => {
-            with_app("actualización", |app| {
+            with_app("update", |app| {
                 app.update_now();
                 Ok(())
             });
@@ -2984,17 +2979,17 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             with_app("Alt+Tab", App::check_task_switcher);
         }
         WM_TIMER if w.0 == FULLSCREEN_TIMER => {
-            with_app("pantalla completa", App::update_fullscreen);
+            with_app("full screen", App::update_fullscreen);
         }
         WM_TIMER if w.0 == SPRING_TIMER => {
-            with_app_then("arrastre sobre una app", App::spring_open);
+            with_app_then("drag over an app", App::spring_open);
         }
         WM_TIMER if w.0 == HIDE_TIMER => {
             // SAFETY: Same as above.
             unsafe {
                 let _ = KillTimer(Some(hwnd), w.0);
             }
-            with_app("ocultación", App::hide_if_unused);
+            with_app("auto-hide", App::hide_if_unused);
         }
         WM_TIMER if w.0 == TRIM_TIMER => {
             // SAFETY: `hwnd` is this live window on its owning UI thread.
@@ -3012,12 +3007,12 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
                 let _ = KillTimer(Some(hwnd), w.0);
             }
             match w.0 {
-                REFRESH_TIMER => with_app("recomposición del dock", App::refresh),
-                SYNC_TIMER => with_app("lectura de ventanas", App::sync),
-                _ => with_app("ocultar la barra de Windows", App::retake_taskbar),
+                REFRESH_TIMER => with_app("dock recomposition", App::refresh),
+                SYNC_TIMER => with_app("window read", App::sync),
+                _ => with_app("hide the Windows taskbar", App::retake_taskbar),
             }
         }
-        APPBAR_CALLBACK => with_app("aviso de AppBar", |app| app.on_appbar_notice(w.0)),
+        APPBAR_CALLBACK => with_app("AppBar notice", |app| app.on_appbar_notice(w.0)),
         // Once the taskbar is set to auto-hide, the dock strip moves to the
         // screen edge, so reserve and reposition it again.
         TASKBAR_TAKEN => with_app("reserva de espacio", |app| {
@@ -3028,12 +3023,12 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             // SAFETY: `hwnd` is this live window on its owning UI thread.
             unsafe { SetTimer(Some(hwnd), TASKBAR_TIMER, TASKBAR_DELAY_MS, None) };
             // Timers do not count the time asleep: aim it again by the clock.
-            with_app("actualización", |app| {
+            with_app("update", |app| {
                 app.schedule_update();
                 Ok(())
             });
         }
-        _ if CONFIG_CHANGED.get() == Some(&msg) => with_app("ajustes", App::reload_config),
+        _ if CONFIG_CHANGED.get() == Some(&msg) => with_app("settings", App::reload_config),
         _ if TASKBAR_CREATED.get() == Some(&msg) => {
             // SAFETY: `hwnd` is this live window on its owning UI thread.
             unsafe { SetTimer(Some(hwnd), TASKBAR_TIMER, TASKBAR_DELAY_MS, None) };
@@ -3043,7 +3038,7 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             // Changing the foreground window does not change the app list; it
             // can only enter or exit full-screen mode.
             HSHELL_WINDOWACTIVATED | HSHELL_RUDEAPPACTIVATED => {
-                with_app("ventana activa", App::update_fullscreen);
+                with_app("active window", App::update_fullscreen);
             }
             // Terminals and browsers retitle their windows many times a minute.
             // The dock shows no titles, so only a window it does not list yet
@@ -3053,7 +3048,7 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
             HSHELL_LANGUAGE => menu_bar_refresh(),
             code => {
                 if code == HSHELL_FLASH {
-                    with_app("aviso de atención", |app| {
+                    with_app("attention notice", |app| {
                         app.on_attention(l.0);
                         Ok(())
                     });
@@ -3109,14 +3104,14 @@ fn message_loop() {
                     }
                     DispatchMessageW(&msg);
                 }
-                with_app_then("animación", App::tick);
+                with_app_then("animation", App::tick);
                 // Wait for the next refresh to pace animation without timers.
                 let _ = DwmFlush();
             } else {
                 let status = GetMessageW(&mut msg, None, 0, 0);
                 if status.0 <= 0 {
                     if status.0 < 0 {
-                        eprintln!("docky: error al leer la cola de mensajes de Windows");
+                        eprintln!("docky: error reading the Windows message queue");
                     }
                     return;
                 }
@@ -3181,7 +3176,6 @@ pub fn run() -> Result<()> {
 
         docky_config::migrate_legacy_folder();
         let config = load_config();
-        strings::set_language(config.language);
         let roster = roster_from(&config);
         let auto_hide = config.auto_hide;
         let mut app = App {
@@ -3253,7 +3247,7 @@ pub fn run() -> Result<()> {
         }
         // Pins and unpins made on the Windows taskbar while Docky was closed.
         if let Err(error) = app.sync_taskbar_pins() {
-            eprintln!("docky: apps fijadas de la barra de Windows: {error:#}");
+            eprintln!("docky: apps pinned to the Windows taskbar: {error:#}");
         }
         app.sync()?;
         // `sync` recomposes only when the list changes; run it unconditionally at startup.
@@ -3265,7 +3259,7 @@ pub fn run() -> Result<()> {
         app.apply_menu_bar_setting();
         // Otherwise the bar shows no app name until the user switches windows.
         if let Err(error) = app.update_menu_bar_app() {
-            eprintln!("docky: barra superior: {error:#}");
+            eprintln!("docky: menu bar: {error:#}");
         }
 
         // The shell notifies this window when a window is created, closed,

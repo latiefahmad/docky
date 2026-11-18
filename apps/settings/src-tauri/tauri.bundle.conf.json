@@ -7,7 +7,7 @@
     ],
     "publisher": "latiefahmad",
     "homepage": "https://github.com/latiefahmad/Docky",
-    "shortDescription": "Dock estilo macOS para Windows",
+    "shortDescription": "macOS-style dock for Windows",
     "category": "Utility",
     "externalBin": [
       "binaries/docky"
@@ -18,8 +18,7 @@
         "installerHooks": "installer/hooks.nsh",
         "installMode": "currentUser",
         "languages": [
-          "English",
-          "Spanish"
+          "English"
         ],
         "displayLanguageSelector": false,
         "installerIcon": "icons/icon.ico"

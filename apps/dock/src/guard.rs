@@ -56,7 +56,7 @@ pub fn spawn() -> Result<()> {
         .args([FLAG, &std::process::id().to_string()])
         .creation_flags(DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
         .spawn()
-        .context("no se pudo lanzar el proceso guardián")?;
+        .context("could not launch the guardian process")?;
     Ok(())
 }
 
@@ -69,7 +69,7 @@ pub fn run(pid: u32) -> Result<()> {
     let process = match unsafe { OpenProcess(PROCESS_SYNCHRONIZE, false, pid) } {
         Ok(process) => process,
         Err(error) => {
-            eprintln!("docky: el guardián no pudo abrir el dock: {error}");
+            eprintln!("docky: the guardian could not open the dock: {error}");
             restore_desktop();
             return Ok(());
         }
@@ -82,11 +82,11 @@ pub fn run(pid: u32) -> Result<()> {
             break;
         }
         if wait != WAIT_TIMEOUT {
-            eprintln!("docky: el guardián no pudo esperar al dock: {wait:?}");
+            eprintln!("docky: the guardian could not wait for the dock: {wait:?}");
             break;
         }
         if health.observe(ui_responds(pid)) {
-            eprintln!("docky: la interfaz dejó de responder; se restaura la barra de Windows");
+            eprintln!("docky: the interface stopped responding; restoring the Windows taskbar");
             // Keep monitoring this process. An unrelated hung app must not
             // hold the guard in window enumeration while it repairs the shell.
             taskbar::give_back_on_exit();

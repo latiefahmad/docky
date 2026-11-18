@@ -50,7 +50,7 @@ minimize effect.
 - A curved island in the menu bar for usage limits from Claude Code, Codex,
   GitHub Copilot, OpenCode Go, Gemini CLI, and Antigravity. Gemini Pro and
   Flash quotas appear separately when available.
-- A separate Settings app with live changes, Spanish and English, and a
+- A separate Settings app with live changes and a
   configurable Genie-style minimize animation.
 - A watchdog restores the Windows taskbar if the dock exits unexpectedly.
 

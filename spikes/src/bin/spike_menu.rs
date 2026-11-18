@@ -78,8 +78,8 @@ fn main() -> anyhow::Result<()> {
         )?;
         let gfx = gfx::Gfx::new()?;
         let items = vec![
-            menu::MenuItem::action(1, "Desactivar &ocultación automática"),
-            menu::MenuItem::action(2, "Mostrar &escritorio"),
+            menu::MenuItem::action(1, "Turn Hiding &Off"),
+            menu::MenuItem::action(2, "Show &Desktop"),
             menu::MenuItem::Action {
                 command: 3,
                 label: "&Mantener en el Dock".into(),
@@ -88,12 +88,12 @@ fn main() -> anyhow::Result<()> {
             },
             menu::MenuItem::Action {
                 command: 4,
-                label: "Abrir al iniciar sesión".into(),
+                label: "Open at login".into(),
                 checked: false,
                 enabled: false,
             },
             menu::MenuItem::Separator,
-            menu::MenuItem::action(5, "&Salir de Docky"),
+            menu::MenuItem::action(5, "&Quit Docky"),
         ];
         let scenario = std::env::args().nth(3).unwrap_or_default();
         std::thread::spawn(move || {
