@@ -18,7 +18,7 @@
   "menuBarAutoHide": "Automatically hide and show the menu bar",
   "menuBarAutoHideHint": "It appears when the pointer rests on the top edge of the screen, never over a window's close buttons.",
   "aiUsage": "Show AI provider usage",
-  "aiUsageHint": "Reads your existing sessions. Queries each provider directly every five minutes and does not save credentials.",
+  "aiUsageHint": "Reads your existing sessions. Queries each provider directly every five minutes and does not save credentials. The panel appears in the menu bar while a supported AI app is running.",
   "autostart": "Open Docky at login",
   "close": "Close",
   "minimize": "Minimize",

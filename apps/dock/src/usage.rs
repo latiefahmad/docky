@@ -143,6 +143,25 @@ impl Provider {
     }
 }
 
+/// The command that starts the provider's own sign-in flow in a console.
+fn login_command(provider: Provider) -> &'static str {
+    match provider {
+        Provider::Claude => "claude auth login",
+        Provider::Codex => "codex login",
+        // Copilot CLI asks for `/login` once it starts.
+        Provider::Copilot => "copilot",
+        Provider::OpenCode => "opencode auth login",
+        // Gemini CLI starts its interactive authentication when needed.
+        Provider::Gemini => "gemini",
+    }
+}
+
+/// Opens a console with the provider's sign-in flow, so the button in the
+/// usage card can continue where the missing credentials stopped the reading.
+pub fn open_login(provider: Provider) -> Result<(), docky_shell::launcher::LaunchError> {
+    docky_shell::launcher::open_console(login_command(provider))
+}
+
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
 pub struct ActiveProviders(pub [bool; Provider::COUNT]);
 
@@ -1182,6 +1201,15 @@ fn parse_codex(value: &Value) -> Vec<Window> {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn each_provider_has_its_own_sign_in_command() {
+        assert_eq!(login_command(Provider::Claude), "claude auth login");
+        assert_eq!(login_command(Provider::Codex), "codex login");
+        assert_eq!(login_command(Provider::Copilot), "copilot");
+        assert_eq!(login_command(Provider::OpenCode), "opencode auth login");
+        assert_eq!(login_command(Provider::Gemini), "gemini");
+    }
 
     #[test]
     fn claude_missing_window_does_not_become_zero() {

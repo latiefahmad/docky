@@ -3,6 +3,16 @@
 Each release lists its changes in English. The release workflow copies the
 section of the version being published into the GitHub release.
 
+## [1.0.2]
+
+### English
+
+- Fixed: the "Sign in" label in the AI usage panel was plain text, so it did
+  nothing when clicked. It is now a button that opens the provider's own
+  sign-in flow in a console: Claude, Codex, Copilot, OpenCode or Gemini.
+- Changed: the menu bar hint for AI usage now says the panel appears while a
+  supported AI app is running, which explains why it stays hidden otherwise.
+
 ## [1.0.1]
 
 ### English

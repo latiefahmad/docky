@@ -24,6 +24,7 @@ use docky_shell::{
     system::{self, Battery, Monitor},
     watch::RegistryWatch,
 };
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, AtomicI32, AtomicIsize, Ordering};
 use windows::{
     UI::{
@@ -109,6 +110,9 @@ static BAR_TOP: AtomicI32 = AtomicI32::new(0);
 static BAR_BOTTOM: AtomicI32 = AtomicI32::new(0);
 static HEADER_BOTTOM: AtomicI32 = AtomicI32::new(0);
 static PANEL_BOTTOM: AtomicI32 = AtomicI32::new(0);
+/// Sign-in pills in screen pixels while the panel is open, so the pointer
+/// shows a hand over them as it does over the rest of the island header.
+static SIGN_IN_ZONES: Mutex<Vec<(i32, i32, i32, i32)>> = Mutex::new(Vec::new());
 /// The hook exists only while the usage panel is open.
 static USAGE_HOOK_WINDOW: AtomicIsize = AtomicIsize::new(0);
 /// The hidden bar's window, for the edge hook; 0 while no hook is installed.
@@ -150,6 +154,9 @@ enum Action {
     Microphone,
     Camera,
 }
+
+/// A provider's sign-in pill in the usage panel, in window pixels.
+type SignInButton = (f32, f32, f32, f32, Provider);
 
 /// Network, volume and taskbar buttons, read only when Windows reports a change.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -203,6 +210,7 @@ pub struct MenuBar {
     island_left: f32,
     island_right: f32,
     refresh_button: Option<(f32, f32, f32, f32)>,
+    sign_in_buttons: Vec<SignInButton>,
     outside_click_hook: Option<HHOOK>,
     /// Watches the top edge while the bar auto-hides.
     edge_watch: Option<EdgeWatch>,
@@ -233,11 +241,19 @@ unsafe extern "system" fn bar_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) -
         WM_SETCURSOR => {
             let mut point = POINT::default();
             // SAFETY: The point is a valid output for the current pointer location.
-            if unsafe { GetCursorPos(&mut point) }.is_ok()
-                && point.x >= ISLAND_LEFT.load(Ordering::Relaxed)
-                && point.x < ISLAND_RIGHT.load(Ordering::Relaxed)
-                && point.y >= BAR_TOP.load(Ordering::Relaxed)
-                && point.y < HEADER_BOTTOM.load(Ordering::Relaxed)
+            let located = unsafe { GetCursorPos(&mut point) }.is_ok();
+            let over_sign_in = located
+                && SIGN_IN_ZONES.lock().is_ok_and(|zones| {
+                    zones.iter().any(|(left, top, right, bottom)| {
+                        point.x >= *left && point.x < *right && point.y >= *top && point.y < *bottom
+                    })
+                });
+            if located
+                && (over_sign_in
+                    || (point.x >= ISLAND_LEFT.load(Ordering::Relaxed)
+                        && point.x < ISLAND_RIGHT.load(Ordering::Relaxed)
+                        && point.y >= BAR_TOP.load(Ordering::Relaxed)
+                        && point.y < HEADER_BOTTOM.load(Ordering::Relaxed)))
             {
                 // SAFETY: The stock hand cursor is owned by Windows.
                 if let Ok(hand) = unsafe { LoadCursorW(None, IDC_HAND) } {
@@ -590,7 +606,7 @@ fn draw_usage_card(
     light: bool,
     island_width: f32,
     y: f32,
-) -> Result<()> {
+) -> Result<Option<(f32, f32, f32, f32)>> {
     let c = &gfx.compositor;
     let px = |logical: f32| (logical * scale).round();
     let ink = if light { Ink::Dark } else { Ink::Light };
@@ -805,11 +821,47 @@ fn draw_usage_card(
                 )?;
             }
         }
+    } else if usage.state == State::SignIn {
+        let label = gfx.text_brush_sized(text.usage_sign_in, scale, 12.0, true, ink)?;
+        let button_width = label.width + px(24.0);
+        let button_height = px(26.0);
+        let button_left = left + px(53.0);
+        let button_top = y + px(36.0);
+        add_rounded_box(
+            c,
+            layers,
+            button_left,
+            button_top,
+            button_width,
+            button_height,
+            px(13.0),
+            rgba(accent.R, accent.G, accent.B, if light { 34 } else { 52 }),
+            Some(rgba(
+                accent.R,
+                accent.G,
+                accent.B,
+                if light { 84 } else { 112 },
+            )),
+        )?;
+        add_visual(
+            c,
+            layers,
+            &label.brush.cast()?,
+            button_left + px(12.0),
+            button_top + (button_height - label.height) / 2.0,
+            label.width,
+            label.height,
+        )?;
+        return Ok(Some((
+            button_left,
+            button_top,
+            button_left + button_width,
+            button_top + button_height,
+        )));
     } else {
         let message = match usage.state {
             State::Loading => text.usage_loading,
-            State::SignIn => text.usage_sign_in,
-            State::Ready | State::Unavailable => text.usage_unavailable,
+            State::Ready | State::Unavailable | State::SignIn => text.usage_unavailable,
         };
         add_panel_text(
             gfx,
@@ -824,7 +876,7 @@ fn draw_usage_card(
             0.72,
         )?;
     }
-    Ok(())
+    Ok(None)
 }
 
 #[expect(
@@ -923,6 +975,7 @@ impl MenuBar {
             island_left: 0.0,
             island_right: 0.0,
             refresh_button: None,
+            sign_in_buttons: Vec::new(),
             outside_click_hook: None,
             edge_watch: None,
             _network: NetworkWatch::new(hwnd.0 as isize, STATUS_CHANGED),
@@ -1203,6 +1256,22 @@ impl MenuBar {
                 }
                 return self.refresh(gfx);
             }
+            if self.expanded
+                && let Some((_, _, _, _, provider)) =
+                    self.sign_in_buttons
+                        .iter()
+                        .find(|(left, top, right, bottom, _)| {
+                            x >= *left && x < *right && y >= *top && y < *bottom
+                        })
+            {
+                if let Err(error) = usage::open_login(*provider) {
+                    eprintln!(
+                        "docky: could not open the {} sign-in: {error}",
+                        provider.name()
+                    );
+                }
+                return Ok(());
+            }
             let header_bottom = if self.expanded {
                 49.0 * self.look.as_ref().map_or(1.0, |look| look.scale)
             } else {
@@ -1454,12 +1523,28 @@ impl MenuBar {
             right = left - px(ITEM_GAP);
         }
 
+        self.sign_in_buttons.clear();
         if look.usage_enabled {
             self.draw_island(gfx, look, &layers, width, height, left_end, right)?;
         } else {
             self.island_left = 0.0;
             self.island_right = 0.0;
             self.refresh_button = None;
+        }
+        if let Ok(mut zones) = SIGN_IN_ZONES.lock() {
+            zones.clear();
+            zones.extend(
+                self.sign_in_buttons
+                    .iter()
+                    .map(|(left, top, right, bottom, _)| {
+                        (
+                            screen.left + *left as i32,
+                            screen.top + *top as i32,
+                            screen.left + *right as i32,
+                            screen.top + *bottom as i32,
+                        )
+                    }),
+            );
         }
 
         self.target.SetRoot(&root)?;
@@ -1686,7 +1771,7 @@ impl MenuBar {
                 button_top + button_height,
             ));
             for (index, (provider, _name, usage, accent)) in providers.iter().enumerate() {
-                draw_usage_card(
+                if let Some((left, top, right, bottom)) = draw_usage_card(
                     gfx,
                     &content,
                     *provider,
@@ -1696,7 +1781,15 @@ impl MenuBar {
                     look.light,
                     island_width,
                     px(53.0 + index as f32 * ISLAND_ROW_HEIGHT),
-                )?;
+                )? {
+                    self.sign_in_buttons.push((
+                        island_left + left,
+                        top,
+                        island_left + right,
+                        bottom,
+                        *provider,
+                    ));
+                }
             }
             let newest_age = providers
                 .iter()
@@ -1718,6 +1811,7 @@ impl MenuBar {
             }
         } else {
             self.refresh_button = None;
+            self.sign_in_buttons.clear();
             let half = island_width / providers.len() as f32;
             for (index, (provider, _name, usage, accent)) in providers.iter().enumerate() {
                 let icon_size = px(18.0) as u32;

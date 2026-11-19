@@ -85,6 +85,13 @@ pub fn open_with(app: &str, files: &[String]) -> Result<(), LaunchError> {
     shell_execute(w!("open"), app, Some(&arguments.join(" ")))
 }
 
+/// Runs `command` in a new console window and keeps it open afterwards, so an
+/// interactive sign-in can finish. The console is started through the shell so
+/// Windows hands it the foreground, as it does for any app the dock opens.
+pub fn open_console(command: &str) -> Result<(), LaunchError> {
+    shell_execute(w!("open"), "cmd.exe", Some(&format!("/k {command}")))
+}
+
 /// `true` if the window in front belongs to a program running as
 /// administrator (Task Manager, an admin terminal, an installer), or to one
 /// the dock cannot even inspect, which is never less privileged.
