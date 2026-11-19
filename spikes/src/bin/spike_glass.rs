@@ -178,9 +178,9 @@ fn hit_test(hwnd: HWND, origin: POINT) {
         };
         // SAFETY: Read-only query.
         let ours = unsafe { WindowFromPoint(point) } == hwnd;
-        let verdict = if ours == expect_ours { "OK" } else { "FALLO" };
+        let verdict = if ours == expect_ours { "OK" } else { "FAIL" };
         println!(
-            "[{verdict}] {name}: el clic llega a {}",
+            "[{verdict}] {name}: the click reaches {}",
             if ours { "Docky" } else { "the window below" }
         );
     }

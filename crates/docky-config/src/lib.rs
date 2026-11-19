@@ -268,7 +268,7 @@ mod tests {
     fn load_should_fail_on_invalid_json() {
         let path = scratch("invalid");
         save(&path, &Config::default()).ok();
-        fs::write(&path, "esto no es json").ok();
+        fs::write(&path, "this is not json").ok();
         assert!(matches!(load(&path), Err(ConfigError::Parse { .. })));
     }
 

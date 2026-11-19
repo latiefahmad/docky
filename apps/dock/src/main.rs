@@ -63,14 +63,14 @@ fn main() -> Result<()> {
             Ok(())
         }
         ["--autostart", "on"] => {
-            let exe = env::current_exe().context("no se pudo localizar docky.exe")?;
+            let exe = env::current_exe().context("could not locate docky.exe")?;
             Ok(autostart::set(Some(&exe.to_string_lossy()))?)
         }
         ["--autostart", "off"] => Ok(autostart::set(None)?),
         [guard::FLAG, pid] => guard::run(pid.parse().context("invalid pid")?),
         ["--usage-worker"] => usage::worker_main(),
         [shell_work::FLAG] => shell_work::worker_main(),
-        _ => bail!("uso: docky [--quit | --restore | --autostart on|off]"),
+        _ => bail!("usage: docky [--quit | --restore | --autostart on|off]"),
     }
 }
 

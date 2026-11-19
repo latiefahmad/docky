@@ -82,7 +82,7 @@ fn main() -> anyhow::Result<()> {
             menu::MenuItem::action(2, "Show &Desktop"),
             menu::MenuItem::Action {
                 command: 3,
-                label: "&Mantener en el Dock".into(),
+                label: "&Keep in Dock".into(),
                 checked: true,
                 enabled: true,
             },

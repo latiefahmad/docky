@@ -51,7 +51,7 @@ impl Health {
 }
 
 pub fn spawn() -> Result<()> {
-    let exe = env::current_exe().context("no se pudo localizar docky.exe")?;
+    let exe = env::current_exe().context("could not locate docky.exe")?;
     Command::new(exe)
         .args([FLAG, &std::process::id().to_string()])
         .creation_flags(DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)

@@ -82,7 +82,7 @@ fn device(kind: D3D_DRIVER_TYPE, single_thread: bool) -> Result<IDXGIDevice> {
 fn main() -> Result<()> {
     let warp = std::env::args().any(|a| a == "--warp");
     let single = std::env::args().any(|a| a == "--single");
-    report("0. arranque");
+    report("0. startup");
     // SAFETY: The dispatcher options remain valid for this current-thread call.
     let _queue = unsafe {
         CreateDispatcherQueueController(DispatcherQueueOptions {
@@ -119,6 +119,6 @@ fn main() -> Result<()> {
     unsafe {
         let _ = EmptyWorkingSet(GetCurrentProcess());
     }
-    report("5. tras recortar el working set");
+    report("5. after trimming the working set");
     Ok(())
 }

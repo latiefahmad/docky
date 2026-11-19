@@ -144,7 +144,7 @@ fn watch() -> Result<()> {
             // The new taskbar needs a moment to apply its initial state.
             sleep(Duration::from_millis(500));
             hide();
-            report("tras reinicio");
+            report("after restart");
             return LRESULT(0);
         }
         unsafe { DefWindowProcW(hwnd, msg, w, l) }
@@ -179,7 +179,7 @@ fn watch() -> Result<()> {
         )?;
 
         hide();
-        report("oculta (watch)");
+        report("hidden (watch)");
         println!("Restart Explorer from Task Manager to test.");
         let mut msg = MSG::default();
         while GetMessageW(&mut msg, None, 0, 0).as_bool() {
@@ -197,22 +197,22 @@ fn main() -> Result<()> {
             hide();
             for i in 1..=4 {
                 sleep(Duration::from_secs(1));
-                report(&format!("oculta (+{i} s)"));
+                report(&format!("hidden (+{i} s)"));
             }
             restore(original);
             sleep(Duration::from_secs(1));
-            report("restaurada");
+            report("restored");
         }
         Some("hide") => {
             hide();
-            report("oculta");
+            report("hidden");
         }
         Some("restore") => {
             restore(false);
-            report("restaurada");
+            report("restored");
         }
         Some("watch") => watch()?,
-        _ => eprintln!("uso: spike_taskbar test | hide | restore | watch"),
+        _ => eprintln!("usage: spike_taskbar test | hide | restore | watch"),
     }
     Ok(())
 }

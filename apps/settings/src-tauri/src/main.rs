@@ -120,7 +120,7 @@ fn is_release_page(url: &str) -> bool {
 #[tauri::command]
 fn open_release_notes(url: String) -> Result<(), String> {
     if !is_release_page(&url) {
-        return Err("enlace no permitido".into());
+        return Err("link not allowed".into());
     }
     launcher::open(&url).map_err(|error| error.to_string())
 }

@@ -16,6 +16,9 @@ section of the version being published into the GitHub release.
   tile.
 - Changed: Docky is now English-only; the Spanish interface and the
   language setting were removed.
+- Fixed: app icons with anti-aliased edges, such as Command Prompt, showed a
+  bright halo and looked broken because their transparency was read as
+  premultiplied; the icon cache is rebuilt automatically.
 - Fixed: some antivirus programs flagged Docky 0.1.6–0.1.8 as a trojan and
   deleted it, often right after updating. Two things looked like malware: to
   show GitHub Copilot and Cursor usage, Docky decrypted VS Code's stored

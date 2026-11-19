@@ -800,7 +800,7 @@ impl App {
         if let Some(bar) = &mut self.menubar {
             bar.refresh(&self.gfx)?;
         }
-        let monitor = primary_monitor().context("no se pudo consultar el monitor principal")?;
+        let monitor = primary_monitor().context("could not query the primary monitor")?;
         let key = StageKey {
             screen: monitor.screen,
             scale: monitor.scale,
@@ -2657,7 +2657,7 @@ fn with_app_then(what: &str, action: impl FnOnce(&mut App) -> Result<Option<Outs
         // Modal calls run outside the borrow, so this should not happen. If it
         // does, discard the message rather than terminating the dock.
         let Ok(mut app) = cell.try_borrow_mut() else {
-            eprintln!("docky: {what}: el dock estaba ocupado; se ignora");
+            eprintln!("docky: {what}: the dock was busy; ignoring");
             return None;
         };
         match app.as_mut().map(action) {
@@ -2918,8 +2918,8 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) ->
         WM_MOUSEMOVE => with_app("mouse move", App::on_mouse_move),
         WM_MOUSELEAVE => with_app("mouse leave", App::on_mouse_leave),
         WM_LBUTTONDOWN => with_app("press", App::on_press),
-        WM_LBUTTONUP => with_app_then("clic", App::on_release),
-        WM_MBUTTONUP => with_app_then("clic central", App::on_middle_click),
+        WM_LBUTTONUP => with_app_then("click", App::on_release),
+        WM_MBUTTONUP => with_app_then("middle click", App::on_middle_click),
         WM_CAPTURECHANGED => {
             // SAFETY: Posting a message to our own window.
             unsafe {
