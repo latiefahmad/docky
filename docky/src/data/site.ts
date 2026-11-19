@@ -17,6 +17,6 @@ export const site = {
   releases: "https://github.com/latiefahmad/Docky/releases",
   download: "https://github.com/latiefahmad/Docky/releases/latest/download/Docky-Setup.exe",
   issues: "https://github.com/latiefahmad/Docky/issues",
-  version: "1.0.0",
+  version: "1.0.1",
   license: "MIT",
 } as const;

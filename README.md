@@ -129,6 +129,21 @@ cd apps\settings
 pnpm build
 ```
 
+## 🚀 Releasing
+
+Published versions are immutable: a fix goes into a new version, never into a
+tag that is already public. Use a patch for fixes, a minor for new features
+and a major for breaking changes.
+
+1. Bump the version in `Cargo.toml` (workspace), `apps/settings/package.json`,
+   `docky/package.json` and `docky/src/data/site.ts`.
+2. Add a `## [x.y.z]` section to the top of `CHANGELOG.md`; the release
+   workflow uses it as the release notes.
+3. Commit and push, then push the matching tag:
+   `git tag Docky-vx.y.z`, `git push origin Docky-vx.y.z`.
+4. The Release workflow builds and signs the installer, rejects a version
+   that is not newer than the latest release, and publishes it by itself.
+
 ## 🗂 Project layout
 
 | Path | Purpose |

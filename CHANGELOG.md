@@ -3,6 +3,19 @@
 Each release lists its changes in English. The release workflow copies the
 section of the version being published into the GitHub release.
 
+## [1.0.1]
+
+### English
+
+- Fixed: app icons with anti-aliased transparency, such as Command Prompt,
+  showed a bright halo and looked broken. Icons are now read with the alpha
+  format the compositor expects, and the icon cache rebuilds automatically.
+- Changed: the last Spanish diagnostic messages and development-tool labels
+  were translated, completing the English-only switch.
+- Changed: a pushed `Docky-v*` tag is now published automatically once the
+  signed installer is built. The workflow refuses to reuse a published
+  version, so every fix gets a new one.
+
 ## [1.0.0]
 
 ### English

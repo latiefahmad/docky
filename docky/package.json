@@ -1,7 +1,7 @@
 {
   "name": "docky",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "node": ">=22.23.4"
   },
